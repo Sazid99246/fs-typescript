@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "calculateBmi": "tsc && node bmiCalculator.ts"
+    "calculateBmi": "tsc && node bmiCalculator.ts",
+    "calculateExercises": "tsc && node calculateExercises.ts"
   },
   "keywords": [],
   "type": "module",
   "devDependencies": {
+    "@types/node": "^26.6.4",
     "typescript": "^7.0.2"
   }
 }

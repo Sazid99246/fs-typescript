@@ -1,7 +1,9 @@
 {
   "compilerOptions":{
+    "allowImportingTsExtensions": true,
     "allowJs": true,
     "noImplicitAny": false,
-    "noEmit": true
+    "noEmit": true,
+    "types": ["node"]
   }
 }
