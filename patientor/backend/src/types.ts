@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export interface Diagnosis {
   code: string
   name: string
@@ -25,26 +27,10 @@ export type NewPatient = Omit<Patient, 'id'>;
 
 export type PublicPatient = Omit<Patient, 'ssn'>;
 
-export const isNewPatient = (object: unknown): object is NewPatient => {
-  if (!object || typeof object !== 'object') {
-    return false;
-  }
-
-  if (
-    !('name' in object) ||
-    !('dateOfBirth' in object) ||
-    !('ssn' in object) ||
-    !('gender' in object) ||
-    !('occupation' in object)
-  ) {
-    return false;
-  }
-
-  return (
-    typeof object.name === 'string' &&
-    typeof object.dateOfBirth === 'string' &&
-    typeof object.ssn === 'string' &&
-    typeof object.occupation === 'string' &&
-    Object.values(Gender).includes(object.gender as Gender)
-  );
-};
+export const newPatientSchema = z.object({
+  name: z.string(),
+  dateOfBirth: z.string(),
+  ssn: z.string(),
+  gender: z.enum(Gender),
+  occupation: z.string()
+});

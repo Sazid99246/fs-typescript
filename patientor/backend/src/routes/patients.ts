@@ -1,6 +1,6 @@
 import express from 'express';
 import patientService from '../services/patientService.ts';
-import { isNewPatient } from '../types.ts';
+import { newPatientSchema } from '../types.ts';
 
 const router = express.Router();
 
@@ -9,15 +9,15 @@ router.get('/', (_req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const body: unknown = req.body;
+  const result = newPatientSchema.safeParse(req.body);
 
-  if (!isNewPatient(body)) {
+  if (!result.success) {
     return res.status(400).json({
-      error: 'malformatted patient data'
+      error: result.error
     });
   }
 
-  const addedPatient = patientService.addPatient(body);
+  const addedPatient = patientService.addPatient(result.data);
 
   return res.json(addedPatient);
 });

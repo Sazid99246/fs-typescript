@@ -10,7 +10,7 @@ const getPatients = (): PublicPatient[] => {
   });
 };
 
-const addPatient = (patient: Omit<Patient, 'id'>): PublicPatient => {
+const addPatient = (patient: Omit<Patient, 'id'>): Patient => {
   const newPatient: Patient = {
     id: uuid(),
     ...patient
@@ -18,10 +18,7 @@ const addPatient = (patient: Omit<Patient, 'id'>): PublicPatient => {
 
   patients.push(newPatient);
 
-  const { ssn: _ssn, ...publicPatient } = newPatient;
-  void _ssn;
-
-  return publicPatient;
+  return newPatient;
 };
 
 export default {
