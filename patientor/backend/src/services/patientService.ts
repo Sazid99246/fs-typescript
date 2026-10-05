@@ -1,19 +1,38 @@
-import { v1 as uuid } from 'uuid';
-import patients from '../../data/patients.ts';
-import type { Patient, PublicPatient } from '../types.ts';
+import { v1 as uuid } from "uuid";
 
-const getPatients = (): PublicPatient[] => {
-  return patients.map((patient): PublicPatient => {
-    const { ssn: _ssn, ...publicPatient } = patient;
+import patients from "../../data/patients.ts";
+
+import type {
+  Patient,
+  NonSensitivePatient
+} from "../types.ts";
+
+const getPatients = (): NonSensitivePatient[] => {
+  return patients.map((patient): NonSensitivePatient => {
+    const {
+      ssn: _ssn,
+      entries: _entries,
+      ...publicPatient
+    } = patient;
+
     void _ssn;
-    return publicPatient as PublicPatient;
+    void _entries;
+
+    return publicPatient;
   });
 };
 
-const addPatient = (patient: Omit<Patient, 'id'>): Patient => {
+const findById = (id: string): Patient | undefined => {
+  return patients.find(patient => patient.id === id);
+};
+
+const addPatient = (
+  patient: Omit<Patient, 'id' | 'entries'>
+): Patient => {
   const newPatient: Patient = {
     id: uuid(),
-    ...patient
+    ...patient,
+    entries: []
   };
 
   patients.push(newPatient);
@@ -23,5 +42,6 @@ const addPatient = (patient: Omit<Patient, 'id'>): Patient => {
 
 export default {
   getPatients,
+  findById,
   addPatient
 };
