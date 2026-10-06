@@ -1,11 +1,27 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { Box, Typography } from "@mui/material";
-import patientService from "../../services/patients";
-import { Patient } from "../../types";
 
-const PatientPage = () => {
+import { useParams } from "react-router-dom";
+
+import { Box, Typography } from "@mui/material";
+
+import patientService from "../../services/patients";
+
+import {
+  Diagnosis,
+  Patient,
+  PatientEntry
+} from "../../types";
+
+import EntryDetails from "../EntryDetails";
+import AddEntryForm from "../AddEntryForm";
+
+interface Props {
+  diagnoses: Diagnosis[];
+}
+
+const PatientPage = ({ diagnoses }: Props) => {
   const { id } = useParams<{ id: string }>();
+
   const [patient, setPatient] = useState<Patient | null>(null);
 
   useEffect(() => {
@@ -22,6 +38,19 @@ const PatientPage = () => {
   if (!patient) {
     return <Typography>Loading...</Typography>;
   }
+
+  const addEntry = (entry: PatientEntry) => {
+    setPatient(currentPatient => {
+      if (!currentPatient) {
+        return currentPatient;
+      }
+
+      return {
+        ...currentPatient,
+        entries: currentPatient.entries.concat(entry)
+      };
+    });
+  };
 
   return (
     <Box>
@@ -45,7 +74,16 @@ const PatientPage = () => {
         <strong>Gender:</strong> {patient.gender}
       </Typography>
 
-      <Typography variant="h5" sx={{ marginTop: 3, marginBottom: 2 }}>
+      <AddEntryForm
+        patientId={patient.id}
+        diagnoses={diagnoses}
+        onEntryAdded={addEntry}
+      />
+
+      <Typography
+        variant="h5"
+        sx={{ marginTop: 3, marginBottom: 2 }}
+      >
         Entries
       </Typography>
 
@@ -63,10 +101,26 @@ const PatientPage = () => {
           </Typography>
 
           <Typography>
-            <ul>
-              {entry.diagnosisCodes?.map(code => <li key={code}>{code}</li>)}
-            </ul>
+            <strong>Specialist:</strong> {entry.specialist}
           </Typography>
+
+          {entry.diagnosisCodes && (
+            <ul>
+              {entry.diagnosisCodes.map(code => {
+                const diagnosis = diagnoses.find(
+                  diagnosis => diagnosis.code === code
+                );
+
+                return (
+                  <li key={code}>
+                    {code} {diagnosis?.name}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+          <EntryDetails entry={entry} />
         </Box>
       ))}
     </Box>

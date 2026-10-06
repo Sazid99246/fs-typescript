@@ -64,6 +64,58 @@ export type Entry =
   | OccupationalHealthcareEntry
   | HospitalEntry;
 
+type UnionOmit<T, K extends string | number | symbol> =
+  T extends unknown ? Omit<T, K> : never;
+
+export type EntryWithoutId = UnionOmit<Entry, 'id'>;
+
+const healthCheckRatingSchema = z.union([
+  z.literal(HealthCheckRating.Healthy),
+  z.literal(HealthCheckRating.LowRisk),
+  z.literal(HealthCheckRating.HighRisk),
+  z.literal(HealthCheckRating.CriticalRisk)
+]);
+
+const healthCheckEntrySchema = z.object({
+  type: z.literal('HealthCheck'),
+  description: z.string(),
+  date: z.string(),
+  specialist: z.string(),
+  diagnosisCodes: z.array(z.string()).optional(),
+  healthCheckRating: healthCheckRatingSchema
+});
+
+const occupationalHealthcareEntrySchema = z.object({
+  type: z.literal('OccupationalHealthcare'),
+  description: z.string(),
+  date: z.string(),
+  specialist: z.string(),
+  diagnosisCodes: z.array(z.string()).optional(),
+  employerName: z.string(),
+  sickLeave: z.object({
+    startDate: z.string(),
+    endDate: z.string()
+  }).optional()
+});
+
+const hospitalEntrySchema = z.object({
+  type: z.literal('Hospital'),
+  description: z.string(),
+  date: z.string(),
+  specialist: z.string(),
+  diagnosisCodes: z.array(z.string()).optional(),
+  discharge: z.object({
+    date: z.string(),
+    criteria: z.string()
+  })
+});
+
+export const newEntrySchema = z.discriminatedUnion('type', [
+  healthCheckEntrySchema,
+  occupationalHealthcareEntrySchema,
+  hospitalEntrySchema
+]);
+
 export interface Patient {
   id: string;
   name: string;
